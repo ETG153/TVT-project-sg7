@@ -4,12 +4,15 @@
 // MMA8452Q I2C address is 0x1C(28)
 #define Addr 0x1C
 
+byte data[7];
+
 void setup()
 {
   // Initialise I2C communication as MASTER
   Wire.begin();
   // Initialise Serial Communication, set baud rate = 115200
   Serial.begin(115200);
+  Serial.println("init");
 
   // Start I2C Transmission
   Wire.beginTransmission(Addr);
@@ -40,10 +43,7 @@ void setup()
   delay(300);
 }
 
-void loop()
-{
-  unsigned int data[7];
-
+void loop() {
   // Request 7 bytes of data
   Wire.requestFrom(Addr, 7);
 
@@ -60,7 +60,7 @@ void loop()
     data[6] = Wire.read();
   }
 
-  // Convert the data to 12-bits
+  // Convert the data to 12-bit format
   int xAccl = ((data[1] * 256) + data[2]) / 16;
   if (xAccl > 2047)
   {
@@ -89,9 +89,6 @@ void loop()
   Serial.print("Acceleration in Z-Axis : ");
   Serial.print((float)zAccl / 1000 * 9.81);
   Serial.println(" m/s2");
-  Serial.println();/*
-  Serial.print("Z Axis Angle: ");
-  Serial.println(map(constrain(zAccl, -1000, 1000), -1000, 1000, 90, -90));
-  Serial.println();*/
+  Serial.println();
   delay(500);
 }
