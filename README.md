@@ -1,6 +1,8 @@
 # TVT-project-sg7
 TVT21SPL Autumn 2022 application project
 
+![Project architecture diagram](documentation/Project architecture.jpg)
+
 ## Project description
 In this project an Arduino development board (devboard), an accelerometer, a Raspberry Pi, and a Python TCP client will be used to train a machine learning algorithm.
 Once this algorithm is trained, it will be ported to C++ and run on the Arduino devboard with the accelerometer attached.
