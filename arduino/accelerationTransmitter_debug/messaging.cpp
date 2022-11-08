@@ -1,24 +1,30 @@
 #include "messaging.h"
 #include "accelerator.h"
 
-//#define DEBUGGING
-
 Messaging::Messaging() {
+#ifdef USE_SERIAL
   Serial.println("messaging created!");
+#endif
   pmanager = new RHReliableDatagram(driver, TRANSMITTER_ADDRESS);
 
-  if (!pmanager->init())
+  if (!pmanager->init()) {
+#ifdef USE_SERIAL
     Serial.println("Radiohead manager init failed");
+#else
+    while (true);
+#endif
+  }
 
 }
 
 Messaging::~Messaging() {
+#ifdef USE_SERIAL
   Serial.println("Messaging deleted!");
+#endif
   delete pmanager;
 }
 
 void Messaging::createMessage(measurement_s m) {
-  //memcpy(data, &m, 6);
   data[0] = m.x >> 8;
   data[1] = m.x & 0xFF;
   data[2] = m.y >> 8;
@@ -29,14 +35,14 @@ void Messaging::createMessage(measurement_s m) {
 }
 
 bool Messaging::sendMessage(uint8_t id, uint8_t flags) {
-#ifdef DEBUGGING
+#ifdef USE_SERIAL
   Serial.print("Sending values ");
   Serial.print((int)(data[0] << 8) + data[1]);
   Serial.print(" ");
   Serial.print((int)(data[2] << 8) + data[3]);
   Serial.print(" ");
   Serial.println((int)(data[4] << 8) + data[5]);
-#else
+#endif
   unsigned long start = millis();
   unsigned long timeout = millis() - start;
   while (timeout < 500)
@@ -60,7 +66,6 @@ bool Messaging::sendMessage(uint8_t id, uint8_t flags) {
   }
   pmanager->waitPacketSent();
   return returnValue;
-#endif
 }
 
 bool Messaging::receiveACK() {
@@ -82,6 +87,7 @@ bool Messaging::receiveACK() {
   receiverResult = pmanager->recvfrom(buf, &len, &from, &to, &id, &flags);
   if (receiverResult)
   {
+#ifdef USE_SERIAL
     Serial.println("ACK received");
     Serial.println((char *)buf);
     Serial.print("Sent from address $");
@@ -90,11 +96,14 @@ bool Messaging::receiveACK() {
     Serial.println(id);
     Serial.print("Flags: ");
     Serial.println(flags);
+#endif
     return true;
   }
   else
   {
+#ifdef USE_SERIAL
     Serial.println("ACK not received, retransmit");
+#endif
     return false;
   }
 

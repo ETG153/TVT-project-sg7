@@ -5,7 +5,9 @@
 #define Addr 0x1C
 
 Accelerator::Accelerator() {
+#ifdef USE_SERIAL
   Serial.println("Accelerator created!");
+#endif
   Wire.begin();
 
   // Start I2C Transmission
@@ -20,17 +22,8 @@ Accelerator::Accelerator() {
   // Start I2C Transmission
   Wire.beginTransmission(Addr);
   // Select control register
-  Wire.write(0x2A);
-  // Active mode
-  Wire.write(0x01);
-  // End I2C Transmission
-  Wire.endTransmission();
-
-  // Start I2C Transmission
-  Wire.beginTransmission(Addr);
-  // Select control register
   Wire.write(0x0E);
-  // Set range to +/- 2g
+  // Set range to +/- 2G
   Wire.write(0x00);
   // End I2C Transmission
   Wire.endTransmission();
@@ -39,7 +32,9 @@ Accelerator::Accelerator() {
 
 Accelerator::~Accelerator() {
   Wire.end();
+#ifdef USE_SERIAL
   Serial.println("Accelerator deleted!");
+#endif
 }
 
 void Accelerator::makeMeasurement() {
@@ -57,14 +52,24 @@ void Accelerator::makeMeasurement() {
   sensorStop();
 
   // Convert the data to 12-bit format
-  m.x = ((data[1] << 8) + data[2]) >> 4;
-  m.x = m.x & 0x0FFF;
+  m.x = (((data[1] << 8) & 0xFF00) | data[2] & 0x00FF) >> 4;
+  m.x = (m.x + 2048) & 0x0FFF;
 
-  m.y = ((data[3] << 8) + data[4]) >> 4;
-  m.y = m.y & 0x0FFF;
+  m.y = (((data[3] << 8) & 0xFF00) | data[4] & 0x00FF) >> 4;
+  m.y = (m.y + 2048) & 0x0FFF;
 
-  m.z = ((data[5] << 8) + data[6]) >> 4;
-  m.y = m.y & 0x0FFF;
+  m.z = (((data[5] << 8) & 0xFF00) | data[6] & 0x00FF) >> 4;
+  m.z = (m.z + 2048) & 0x0FFF;
+
+#ifdef USE_SERIAL
+  Serial.println("Measurement made!");
+  Serial.print("X: ");
+  Serial.println(m.x);
+  Serial.print("Y: ");
+  Serial.println(m.y);
+  Serial.print("Z: ");
+  Serial.println(m.z);
+#endif
 }
 
 measurement_s Accelerator::getMeasurement() {
@@ -94,9 +99,8 @@ void Accelerator::sensorStop() {
   // Stop I2C Transmission
   Wire.endTransmission();
 
-  if (Wire.available()) {
-    while (Wire.available()) {
-      Wire.read();
-    }
+  // Dump RX buffer contents
+  while (Wire.available()) {
+    Wire.read();
   }
 }
