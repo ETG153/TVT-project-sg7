@@ -85,19 +85,25 @@ bool Messaging::receiveACK() {
 
   // Jos while luupista päästään, niin on saatu ACK tai on kulunut 1s
   receiverResult = pmanager->recvfrom(buf, &len, &from, &to, &id, &flags);
-  if (receiverResult)
-  {
+  if (receiverResult) {
+    if (from == RECEIVER_ADDRESS) {
 #ifdef USE_SERIAL
-    Serial.println("ACK received");
-    Serial.println((char *)buf);
-    Serial.print("Sent from address $");
-    Serial.println(from, HEX);
-    Serial.print("ID: ");
-    Serial.println(id);
-    Serial.print("Flags: ");
-    Serial.println(flags);
+      Serial.println("ACK received");
+      Serial.println((char *)buf);
+      Serial.print("Sent from address $");
+      Serial.println(from, HEX);
+      Serial.print("ID: ");
+      Serial.println(id);
+      Serial.print("Flags: ");
+      Serial.println(flags);
 #endif
-    return true;
+      return true;
+    } else {
+#ifdef USE_SERIAL
+      Serial.println("ACK received from wrong address, retransmit");
+#endif
+      return false;
+    }
   }
   else
   {
