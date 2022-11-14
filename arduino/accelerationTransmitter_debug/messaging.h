@@ -2,7 +2,7 @@
 #define MESSAGING_H
 
 #define USE_SERIAL
-#define TESTING
+//#define TESTING
 
 struct measurement_s;
 
@@ -28,6 +28,7 @@ class Messaging {
     uint8_t buf[RH_ASK_MAX_MESSAGE_LEN];
     uint8_t data[RH_ASK_MAX_MESSAGE_LEN];
     uint8_t messageLength = 0;
+    uint8_t _latestID = 0;
     RH_ASK driver;
     RHReliableDatagram * pmanager;
 };

@@ -58,6 +58,8 @@ bool Messaging::sendMessage(uint8_t id, uint8_t flags) {
   pmanager->setHeaderId(id);
   pmanager->setHeaderFlags(flags);
 
+  _latestID = id;
+
   bool returnValue = false;
 
   if (pmanager->sendto(data, messageLength, RECEIVER_ADDRESS))
@@ -87,17 +89,24 @@ bool Messaging::receiveACK() {
   receiverResult = pmanager->recvfrom(buf, &len, &from, &to, &id, &flags);
   if (receiverResult) {
     if (from == RECEIVER_ADDRESS) {
+      if (id == _latestID) {
 #ifdef USE_SERIAL
-      Serial.println("ACK received");
-      Serial.println((char *)buf);
-      Serial.print("Sent from address $");
-      Serial.println(from, HEX);
-      Serial.print("ID: ");
-      Serial.println(id);
-      Serial.print("Flags: ");
-      Serial.println(flags);
+        Serial.println("ACK received");
+        Serial.println((char *)buf);
+        Serial.print("Sent from address $");
+        Serial.println(from, HEX);
+        Serial.print("ID: ");
+        Serial.println(id);
+        Serial.print("Flags: ");
+        Serial.println(flags);
 #endif
-      return true;
+        return true;
+      } else {
+#ifdef USE_SERIAL
+        Serial.println("ACK received for wrong ID, retransmit");
+#endif
+        return false;
+      }
     } else {
 #ifdef USE_SERIAL
       Serial.println("ACK received from wrong address, retransmit");
