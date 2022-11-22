@@ -1,35 +1,44 @@
+
 #include "messaging.h"
 #include "accelerator.h"
 
-void setup()
-{
+uint8_t NumberOfMeasurements = 0;
+uint8_t orientationFlag = 0;
+
+void setup() {
   Serial.begin(115200);
+  delay(500);
 }
 
-void loop()
-{
-  Accelerator accel;
-  Messaging rf;
+void loop() {
+  NumberOfMeasurements = 0;
+  orientationFlag = 0;
+
   Serial.println("Enter measurement count");
-  int NumberOfMeasurements = 0;
-  while (NumberOfMeasurements == 0)
-  {
-    if (Serial.available() > 0)
-    {
+  while (NumberOfMeasurements == 0) {
+    if (Serial.available() > 0) {
       NumberOfMeasurements = Serial.parseInt();
     }
   }
 
-  for (int M = 0; M < NumberOfMeasurements; M++)
-  {
+  Serial.println("What's up? (X/x, Y/y, Z/z)");
+  while (orientationFlag != 'X' && orientationFlag != 'x' && orientationFlag != 'Y' && orientationFlag != 'y' && orientationFlag != 'Z' && orientationFlag != 'z') {
+    if (Serial.available() > 0) {
+      orientationFlag = Serial.read();
+    }
+  }
+
+  Accelerator accel;
+  Messaging rf;
+
+  for (int M = 0; M < NumberOfMeasurements; M++) {
     const uint8_t id = M;
-    const uint8_t flags = 0xff;
 
     accel.makeMeasurement();
-    Measurement m = accel.getMeasurement();
-    rf.createMessage(m);
+    measurement_s measurement = accel.getMeasurement();
+    rf.createMessage(measurement);
 
-    if (rf.sendMessage(id, flags)) {
+    if (rf.sendMessage(id, orientationFlag)) {
       Serial.println("Successfull transmission");
       if (rf.receiveACK()) {
         Serial.println("Receiver got message, going to next measurement");

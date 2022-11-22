@@ -1,26 +1,29 @@
 #ifndef ACCELERATOR_H
 #define ACCELERATOR_H
 
+#define USE_SERIAL
+
 #include "messaging.h"
 
-struct Measurement
+struct measurement_s
 {
-  int x;
-  int y;
-  int z;
+  unsigned int x;
+  unsigned int y;
+  unsigned int z;
 };
 
 class Accelerator
 {
-public:
-  Accelerator();
-  ~Accelerator();
-  void makeMeasurement();
-  Measurement getMeasurement();
+  public:
+    Accelerator();
+    ~Accelerator();
+    void makeMeasurement();
+    measurement_s getMeasurement();
 
-private:
-  Measurement m;
- 
+  private:
+    measurement_s m;
+    void sensorStart();
+    void sensorStop();
 };
 
 #endif // ACCELERATOR_H
