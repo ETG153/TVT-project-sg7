@@ -1,0 +1,5 @@
+172.20.241.9
+dbaccess_ro
+vsdjkvwselkvwe234wv234vsdfas
+measurements
+EOF
