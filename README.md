@@ -41,4 +41,5 @@ With each iteration the randomized centroids get closer to the true centroids of
 
 ### Step 4:
 The previous step is repeated until the centroids' coordinates do not change, at which point we have the finished centroids.
+
 ![Scatter plot of finished algorithm](documentation/scatterplot-iterated.png)
