@@ -29,14 +29,17 @@ The algorithm's purpose is to find the centroid (arithmetic mean of data points)
 The algorithm works as follows:
 ### Step 1:
 The source data is imported and formatted to a useful format:
+
 ![Scatter plot of formatted data set](documentation/scatterplot-rawdata.png)
 
 ### Step 2:
 The algorithm generates K random centroids, where K is the desired centroid count. In this case we know there are 6, so we will generate 6 centroids.
+
 ![Scatter plot with randomized centroids](documentation/scatterplot-randomcenters.png)
 
 ### Step 3:
 With each iteration the randomized centroids get closer to the true centroids of each cluster.
+
 ![Scatter plot with once iterated centroids and their starting points](documentation/scatterplot-oneiteration.png)
 
 ### Step 4:
