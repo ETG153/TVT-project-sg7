@@ -22,3 +22,27 @@ The database's contents can be read by a computer over TCP with a HTTP API.
 ### TCP client
 The client will be written in Python, and operated on the student's laptop.
 The data read by the client will then be parsed and prepared for use for machine learning.
+
+## K-means algorithm explained
+The algorithm's purpose is to find the centroid (arithmetic mean of data points) in each cluster. In this situation, there is one cluster for each axis from the "center" (2048, 2048, 2048). These are -X, +X, -Y, +Y, -Z, and +Z. Around each one of these centroids is a cluster of data points, each representing one measurement made by the Arduino setup.
+
+The algorithm works as follows:
+### Step 1:
+The source data is imported and formatted to a useful format:
+
+![Scatter plot of formatted data set](documentation/scatterplot-rawdata.png)
+
+### Step 2:
+The algorithm generates K random centroids, where K is the desired centroid count. In this case we know there are 6, so we will generate 6 centroids.
+
+![Scatter plot with randomized centroids](documentation/scatterplot-randomcenters.png)
+
+### Step 3:
+With each iteration the randomized centroids get closer to the true centroids of each cluster.
+
+![Scatter plot with once iterated centroids and their starting points](documentation/scatterplot-oneiteration.png)
+
+### Step 4:
+The previous step is repeated until the centroids' coordinates do not change, at which point we have the finished centroids.
+
+![Scatter plot of finished algorithm](documentation/scatterplot-iterated.png)
