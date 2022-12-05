@@ -6,7 +6,7 @@
 using namespace std;
 
 struct vector_s {
-    int x, y, z = 0;
+    float x, y, z = 0;
 };
 
 struct result_s {
@@ -46,6 +46,7 @@ const float weights[][12] = {
 
 //  Function prototypes
 void nnevaluate(vector_s input, result_s* output);
+float nnactivationfunction(float input);
 void decoderesults(result_s* inputresults);
 
 //  Main program
@@ -109,12 +110,12 @@ void nnevaluate(const vector_s input, result_s* output) {
     float hidden2_l[12] = { 0 };
     float output_l[6] = { 0 };
 
-    float* conlayers[] = {input_l, hidden1_l, hidden2_l, output_l};
+    float* conlayers[] = { input_l, hidden1_l, hidden2_l, output_l };
     const int conlayersizes[] = {
-        sizeof(input_l)     / sizeof(input_l[0]),
-        sizeof(hidden1_l)   / sizeof(hidden1_l[0]),
-        sizeof(hidden2_l)   / sizeof(hidden2_l[0]),
-        sizeof(output_l)    / sizeof(output_l[0])
+        sizeof(input_l) / sizeof(input_l[0]),
+        sizeof(hidden1_l) / sizeof(hidden1_l[0]),
+        sizeof(hidden2_l) / sizeof(hidden2_l[0]),
+        sizeof(output_l) / sizeof(output_l[0])
     };
     const int conlayercount = sizeof(conlayers) / sizeof(conlayers[0]);
 
@@ -122,19 +123,72 @@ void nnevaluate(const vector_s input, result_s* output) {
 
     for (int conlayer = 0; conlayer < (conlayercount - 1); conlayer++) {
 
-        const float* sourcelayer = conlayers[conlayer] + 1; // Add 1 input node for bias
+        const float* sourcelayer = conlayers[conlayer];
         float* destlayer = conlayers[conlayer + 1];
 
-        const int inputlength = conlayersizes[conlayer];
+        const int inputlength = conlayersizes[conlayer] + 1; // Add 1 input node for bias
         const int outputlength = conlayersizes[conlayer + 1];
 
         for (int idxout = 0; idxout < outputlength; idxout++) {
             for (int idxin = 0; idxin < inputlength; idxin++) {
-                //  TODO: Connection weight reading
-                destlayer[idxout] += (sourcelayer[idxin] * 0);
-            }
-        }
+                const float weight = weights[idxin + weightindexoffset][idxout];
+                float inval;
+                if (idxin == (inputlength - 1)) {
+                    inval = 1.0;
+                }
+                else {
+                    inval = sourcelayer[idxin];
+                }
+                destlayer[idxout] += inval * weight;
+                cout << "Input node: " << idxin << "\tOutput node: " << idxout << "\tInVal: " << inval << "\tWeight: " << weight << " @ " << (idxin + weightindexoffset) << " " << (idxout) << "\tResult: " << (inval * weight) << "\n";
+            } // Input node loop
+
+            destlayer[idxout] = nnactivationfunction(destlayer[idxout]);
+            cout << "Result: " << destlayer[idxout] << "\n\n";
+        } // Output node loop
+        cout << "\n";
+        weightindexoffset += inputlength;
+    } // Layer connecting web layer loop
+
+    for (int i = 0; i < (sizeof(output_l) / sizeof(output_l[0])); i++) {
+        output->results[i] = output_l[i];
     }
+}
+
+//#define NN_ALG_BINSTEP
+//#define NN_ALG_LINEAR
+//#define NN_ALG_SIGMOID
+#define NN_ALG_TANH
+
+#define BINSTEP_TRESHOLD 0.5
+
+float nnactivationfunction(float input) {
+#ifdef NN_ALG_BINSTEP
+
+    if (input >= BINSTEP_TRESHOLD) {
+        return 1.0;
+    }
+    else {
+        return 0.0;
+    }
+
+#elif defined NN_ALG_LINEAR
+
+    return input;
+
+#elif defined NN_ALG_SIGMOID
+
+    return (1 / (1 + exp(-input)));
+
+#elif defined NN_ALG_TANH
+
+    return ((exp(input) - exp(-input)) / (exp(input) + exp(-input)));
+
+#else
+
+    return 0.0;
+
+#endif
 }
 
 void decoderesults(result_s* inputresults) {
