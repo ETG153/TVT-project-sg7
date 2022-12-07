@@ -2,8 +2,6 @@
 #ifndef ACCELERATOR_H
 #define ACCELERATOR_H
 
-#define USE_SERIAL
-
 #include "messaging.h"
 
 struct measurement_s
