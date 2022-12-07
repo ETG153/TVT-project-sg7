@@ -5,6 +5,8 @@
 #define BTN_PIN 12
 #define BTN_PRESSED (digitalRead(BTN_PIN) == LOW)
 
+//#define VERBOSE
+
 const int centroids[][3] = {
   {1985, 3084, 2080},
   {2015, 1951, 1041},
@@ -23,61 +25,80 @@ EvaluateK kmeans(k, centroids);
 void setup() {
   Serial.begin(115200);
   delay(500);
+#ifdef VERBOSE
   Serial.println();
   Serial.println("### Ported K-means evaluator ###");
+#endif
 
   pinMode(BTN_PIN, INPUT_PULLUP);
 
+#ifdef VERBOSE
   Serial.println("Assigning axis...");
+#endif
   assignAxis(k, centroidAxis);
 }
 
 void loop() {
+#ifdef VERBOSE
   Serial.println();
   Serial.println("Awaiting input");
+#endif
   while (!BTN_PRESSED)
     delay(100);
+#ifdef VERBOSE
   Serial.println("Button pressed!");
+#endif
   while (BTN_PRESSED)
     delay(100);
+#ifdef VERBOSE
   Serial.println("Button released!");
-  
-  Serial.println("Making measurement...");
-  Accelerator accel;
-  accel.makeMeasurement();
-  measurement_s measurement = accel.getMeasurement();
-  point_s testpoint;
-  testpoint.x = measurement.x;
-  testpoint.y = measurement.y;
-  testpoint.z = measurement.z;
-  const int result = kmeans.evaluate(testpoint);
 
-  Serial.print("Result: Axis currently pointed up is ");
-  switch(centroidAxis[result]){
-    case 'x':
-    Serial.println("negative X");
-      break;
-      
-    case 'y':
-    Serial.println("negative Y");
-      break;
-      
-    case 'z':
-    Serial.println("negative Z");
-      break;
-      
-    case 'X':
-    Serial.println("positive X");
-      break;
-      
-    case 'Y':
-    Serial.println("positive Y");
-      break;
-      
-    case 'Z':
-    Serial.println("positive Z");
-      break;
-      
+  Serial.println("Making measurement...");
+#endif
+
+  for (byte i = 0; i < 25; i++) {
+
+    Accelerator accel;
+    accel.makeMeasurement();
+    measurement_s measurement = accel.getMeasurement();
+    point_s testpoint;
+    testpoint.x = measurement.x;
+    testpoint.y = measurement.y;
+    testpoint.z = measurement.z;
+    const int result = kmeans.evaluate(testpoint);
+
+#ifdef VERBOSE
+    Serial.print("Result: Axis currently pointed up is ");
+    switch (centroidAxis[result]) {
+      case 'x':
+        Serial.println("negative X");
+        break;
+
+      case 'y':
+        Serial.println("negative Y");
+        break;
+
+      case 'z':
+        Serial.println("negative Z");
+        break;
+
+      case 'X':
+        Serial.println("positive X");
+        break;
+
+      case 'Y':
+        Serial.println("positive Y");
+        break;
+
+      case 'Z':
+        Serial.println("positive Z");
+        break;
+
+    }
+#else
+    Serial.println(centroidAxis[result]);
+    delay(250);
+#endif
   }
 }
 

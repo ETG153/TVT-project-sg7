@@ -5,6 +5,9 @@
 // MMA8452Q I2C address is 0x1C(28)
 #define ADDR 0x1C
 
+//#define USE_SERIAL
+#undef USE_SERIAL
+
 Accelerator::Accelerator() {
 #ifdef USE_SERIAL
   Serial.println("Accelerator created!");
