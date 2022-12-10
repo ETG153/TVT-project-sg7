@@ -1,1 +1,5 @@
 login.txt
+.vscode
+.~lock*
+.editorconfig
+*.ckpt.*
