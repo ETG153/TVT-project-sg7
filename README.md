@@ -89,7 +89,8 @@ A neural network is simply too resource intensive for such a use case, and is in
 ## Additional goals
 Various other pieces of software were tested during this project, which were not necessarily used in the project itself. These are:
 - Setting up password-free login to a remote server with an ed25519 key
-- Apache and PHP
+- Apache
+- PHP
 - Wireshark
 - Netfilter firewall
 - Tailscale VPN
