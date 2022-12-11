@@ -96,4 +96,5 @@ Various other pieces of software were tested during this project, which were not
 - Ansible
 - Thunder client
 - OpenALPR
+
 The familiarity with these pieces of software will likely be useful in future projects, where the knowledge will speed up development.
